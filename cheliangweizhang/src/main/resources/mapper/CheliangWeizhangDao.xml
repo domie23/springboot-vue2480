@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.CheliangWeizhangDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.cheliang_id as cheliangId
+        ,a.yonghu_id as yonghuId
+        ,a.cheliang_weizhang_uuid_number as cheliangWeizhangUuidNumber
+        ,a.cheliang_weizhang_name as cheliangWeizhangName
+        ,a.cheliang_weizhang_photo as cheliangWeizhangPhoto
+        ,a.cheliang_weizhang_video as cheliangWeizhangVideo
+        ,a.cheliang_weizhang_types as cheliangWeizhangTypes
+        ,a.cheliang_weizhang_content as cheliangWeizhangContent
+        ,a.weizhang_time as weizhangTime
+        ,a.cheliang_weizhang_zhuangtai_types as cheliangWeizhangZhuangtaiTypes
+        ,a.cheliang_weizhang_shensu_content as cheliangWeizhangShensuContent
+        ,a.cheliang_weizhang_yesno_types as cheliangWeizhangYesnoTypes
+        ,a.cheliang_weizhang_yesno_text as cheliangWeizhangYesnoText
+        ,a.cheliang_weizhang_shenhe_time as cheliangWeizhangShenheTime
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.CheliangWeizhangView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,cheliang.yonghu_id as cheliangYonghuId
+        ,cheliang.cheliang_name as cheliangName
+        ,cheliang.cheliang_uuid_number as cheliangUuidNumber
+        ,cheliang.cheliang_photo as cheliangPhoto
+        ,cheliang.cheliang_types as cheliangTypes
+        ,cheliang.cheliang_chepai as cheliangChepai
+        ,cheliang.cheliang_yanse as cheliangYanse
+        ,cheliang.cheliang_pinpai as cheliangPinpai
+        ,cheliang.cheliang_chezuo as cheliangChezuo
+        ,cheliang.cheliang_content as cheliangContent
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.new_money as newMoney
+
+        FROM cheliang_weizhang  a
+        left JOIN cheliang cheliang ON a.cheliang_id = cheliang.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.cheliangId != null and params.cheliangId != ''">
+                and (
+                    a.cheliang_id = #{params.cheliangId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                    or cheliang.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test=" params.cheliangWeizhangUuidNumber != '' and params.cheliangWeizhangUuidNumber != null and params.cheliangWeizhangUuidNumber != 'null' ">
+                and a.cheliang_weizhang_uuid_number like CONCAT('%',#{params.cheliangWeizhangUuidNumber},'%')
+            </if>
+            <if test=" params.cheliangWeizhangName != '' and params.cheliangWeizhangName != null and params.cheliangWeizhangName != 'null' ">
+                and a.cheliang_weizhang_name like CONCAT('%',#{params.cheliangWeizhangName},'%')
+            </if>
+            <if test=" params.cheliangWeizhangVideo != '' and params.cheliangWeizhangVideo != null and params.cheliangWeizhangVideo != 'null' ">
+                and a.cheliang_weizhang_video like CONCAT('%',#{params.cheliangWeizhangVideo},'%')
+            </if>
+            <if test="params.cheliangWeizhangTypes != null and params.cheliangWeizhangTypes != ''">
+                and a.cheliang_weizhang_types = #{params.cheliangWeizhangTypes}
+            </if>
+            <if test=" params.cheliangWeizhangContent != '' and params.cheliangWeizhangContent != null and params.cheliangWeizhangContent != 'null' ">
+                and a.cheliang_weizhang_content like CONCAT('%',#{params.cheliangWeizhangContent},'%')
+            </if>
+            <if test=" params.weizhangTimeStart != '' and params.weizhangTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.weizhang_time) >= UNIX_TIMESTAMP(#{params.weizhangTimeStart}) ]]>
+            </if>
+            <if test=" params.weizhangTimeEnd != '' and params.weizhangTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.weizhang_time) <= UNIX_TIMESTAMP(#{params.weizhangTimeEnd}) ]]>
+            </if>
+            <if test="params.cheliangWeizhangZhuangtaiTypes != null and params.cheliangWeizhangZhuangtaiTypes != ''">
+                and a.cheliang_weizhang_zhuangtai_types = #{params.cheliangWeizhangZhuangtaiTypes}
+            </if>
+            <if test=" params.cheliangWeizhangShensuContent != '' and params.cheliangWeizhangShensuContent != null and params.cheliangWeizhangShensuContent != 'null' ">
+                and a.cheliang_weizhang_shensu_content like CONCAT('%',#{params.cheliangWeizhangShensuContent},'%')
+            </if>
+            <if test="params.cheliangWeizhangYesnoTypes != null and params.cheliangWeizhangYesnoTypes != ''">
+                and a.cheliang_weizhang_yesno_types = #{params.cheliangWeizhangYesnoTypes}
+            </if>
+            <if test=" params.cheliangWeizhangYesnoText != '' and params.cheliangWeizhangYesnoText != null and params.cheliangWeizhangYesnoText != 'null' ">
+                and a.cheliang_weizhang_yesno_text like CONCAT('%',#{params.cheliangWeizhangYesnoText},'%')
+            </if>
+            <if test=" params.cheliangWeizhangShenheTimeStart != '' and params.cheliangWeizhangShenheTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.cheliang_weizhang_shenhe_time) >= UNIX_TIMESTAMP(#{params.cheliangWeizhangShenheTimeStart}) ]]>
+            </if>
+            <if test=" params.cheliangWeizhangShenheTimeEnd != '' and params.cheliangWeizhangShenheTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.cheliang_weizhang_shenhe_time) <= UNIX_TIMESTAMP(#{params.cheliangWeizhangShenheTimeEnd}) ]]>
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断车辆的id不为空 -->
+            <if test=" params.cheliangIdNotNull != '' and params.cheliangIdNotNull != null and params.cheliangIdNotNull != 'null' ">
+                and a.cheliang_id IS NOT NULL
+            </if>
+            <if test=" params.cheliangName != '' and params.cheliangName != null and params.cheliangName != 'null' ">
+                and cheliang.cheliang_name like CONCAT('%',#{params.cheliangName},'%')
+            </if>
+            <if test=" params.cheliangUuidNumber != '' and params.cheliangUuidNumber != null and params.cheliangUuidNumber != 'null' ">
+                and cheliang.cheliang_uuid_number like CONCAT('%',#{params.cheliangUuidNumber},'%')
+            </if>
+            <if test="params.cheliangTypes != null  and params.cheliangTypes != ''">
+                and cheliang.cheliang_types = #{params.cheliangTypes}
+            </if>
+
+            <if test=" params.cheliangChepai != '' and params.cheliangChepai != null and params.cheliangChepai != 'null' ">
+                and cheliang.cheliang_chepai like CONCAT('%',#{params.cheliangChepai},'%')
+            </if>
+            <if test=" params.cheliangYanse != '' and params.cheliangYanse != null and params.cheliangYanse != 'null' ">
+                and cheliang.cheliang_yanse like CONCAT('%',#{params.cheliangYanse},'%')
+            </if>
+            <if test=" params.cheliangPinpai != '' and params.cheliangPinpai != null and params.cheliangPinpai != 'null' ">
+                and cheliang.cheliang_pinpai like CONCAT('%',#{params.cheliangPinpai},'%')
+            </if>
+            <if test=" params.cheliangChezuo != '' and params.cheliangChezuo != null and params.cheliangChezuo != 'null' ">
+                and cheliang.cheliang_chezuo like CONCAT('%',#{params.cheliangChezuo},'%')
+            </if>
+            <if test=" params.cheliangContent != '' and params.cheliangContent != null and params.cheliangContent != 'null' ">
+                and cheliang.cheliang_content like CONCAT('%',#{params.cheliangContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(cheliang.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(cheliang.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
